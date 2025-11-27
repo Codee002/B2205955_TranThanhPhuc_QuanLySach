@@ -1,7 +1,7 @@
 <template>
   <main class="app-main p-0" style="height: 100%">
     <div class="container" style="width: 90%">
-      <h2 class="text-center fw-bolder mt-4 mb-4">Danh sách danh mục</h2>
+      <h2 class="text-center fw-bolder mt-4 mb-4">Quản lý danh mục</h2>
       <div class="d-flex align-items-center mb-1 row">
         <div class="col-4">
           <div class="form-group d-flex">
@@ -45,13 +45,8 @@
         <tbody v-if="categorysSearch.length != 0">
           <tr v-for="category in categorysSearch" :key="category._id">
             <td>{{ category.Ten }}</td>
-            <td>0</td>
+            <td>{{ category.soLuongSach }}</td>
             <td>
-              <router-link class="me-2">
-                <button class="btn btn-primary">
-                  <i class="fa-solid fa-circle-info"></i>
-                </button>
-              </router-link>
               <router-link
                 :to="{ name: 'category.update', params: { id: category._id } }"
                 class="me-2"
