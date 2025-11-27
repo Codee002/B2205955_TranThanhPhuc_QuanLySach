@@ -6,63 +6,6 @@
     >
       <!-- <p class="ms-3">Trang chủ</p> -->
     </div>
-
-    <!-- User Nav -->
-    <div class="info-group dropdown-toggle" style="height: 100%; width: 100em">
-      <!-- Notification -->
-      <div class="notifi__wrapper">
-        <i class="fa-solid fa-bell" @click="toggleNotification"></i>
-        <span class="notification-dot"></span>
-      </div>
-
-      <!-- Setting -->
-      <img class="avatar" src="" @click="toggleSetting" alt="" />
-
-      <!-- Dropdown Setting -->
-      <ul class="dropdown-menu show" v-if="isSettingOpen && user">
-        <router-link class="d-flex">
-          <nav-component>
-            <template v-slot:icon>
-              <img class="avatar" src="" alt="" />
-            </template>
-            <template v-slot:des>TEST</template>
-          </nav-component>
-        </router-link>
-        <hr />
-        <router-link
-          v-if="user.role == 'admin'"
-          :to="{ name: 'home' }"
-          class="d-flex"
-        >
-          <nav-component>
-            <template v-slot:icon>
-              <i class="fa-solid fa-house"></i>
-            </template>
-            <template v-slot:des>Trang chủ</template>
-          </nav-component>
-        </router-link>
-        <router-link :to="{ name: 'setting.info' }" class="d-flex">
-          <nav-component>
-            <template v-slot:icon>
-              <i class="fa-solid fa-gear"></i>
-            </template>
-            <template v-slot:des>Cài đặt & quyền riêng tư</template>
-          </nav-component>
-        </router-link>
-        <router-link
-          :to="{ name: 'auth.login' }"
-          class="d-flex"
-          @click="logout()"
-        >
-          <nav-component>
-            <template v-slot:icon>
-              <i class="fa-solid fa-right-from-bracket"></i>
-            </template>
-            <template v-slot:des>Đăng xuất</template>
-          </nav-component>
-        </router-link>
-      </ul>
-    </div>
   </header>
 </template>
 
@@ -87,20 +30,7 @@ defineProps({
     require: true,
     default: null,
   },
-  notifications: {},
 });
-
-// Mở setting
-function toggleSetting() {
-  isSettingOpen.value = !isSettingOpen.value;
-  isNotificationOpen.value = false;
-}
-
-// Mở thông báo
-function toggleNotification() {
-  isNotificationOpen.value = !isNotificationOpen.value;
-  isSettingOpen.value = false;
-}
 </script>
 
 <style scoped>

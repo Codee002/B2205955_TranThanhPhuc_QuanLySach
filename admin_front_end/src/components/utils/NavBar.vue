@@ -5,6 +5,74 @@
     </div>
     <hr />
     <div class="side__bar__feature">
+      <div class="feature__container">
+        <div class="feature__group">
+          <router-link
+            :to="{ name: 'dashboard' }"
+            class="d-flex"
+            style="width: 100%"
+          >
+            <div class="d-flex nav-group">
+              <i class="fa-solid fa-chart-area"></i>
+              Thống kê
+              <br />
+            </div>
+          </router-link>
+        </div>
+      </div>
+
+      <div class="feature__container">
+        <!-- <p class="feature__title">Quản lý sách</p> -->
+        <div class="feature__group">
+          <router-link
+            :to="{ name: 'book' }"
+            class="d-flex"
+            style="width: 100%"
+          >
+            <div class="d-flex nav-group">
+              <i class="fa-solid fa-book"></i>
+              Quản lý sách
+              <br />
+            </div>
+          </router-link>
+        </div>
+      </div>
+
+      <div class="feature__container">
+        <!-- <p class="feature__title">Quản lý sách</p> -->
+        <div class="feature__group">
+          <router-link
+            :to="{ name: 'borrow' }"
+            class="d-flex"
+            style="width: 100%"
+          >
+            <div class="d-flex nav-group">
+              <i class="fa-solid fa-list"></i>
+              Quản lý phiếu mượn
+              <br />
+            </div>
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Đọc giả -->
+      <div class="feature__container">
+        <!-- <p class="feature__title">Quản lý tác giả</p> -->
+        <div class="feature__group">
+          <router-link
+            :to="{ name: 'reader' }"
+            class="d-flex"
+            style="width: 100%"
+          >
+            <div class="d-flex nav-group">
+              <i class="fa-solid fa-book-open-reader"></i>
+              Quản lý đọc giả
+              <br />
+            </div>
+          </router-link>
+        </div>
+      </div>
+
       <!-- Tác giả -->
       <div class="feature__container">
         <!-- <p class="feature__title">Quản lý tác giả</p> -->
@@ -61,15 +129,11 @@
 
       <div class="feature__container">
         <!-- <p class="feature__title">Quản lý sách</p> -->
-        <div class="feature__group">
-          <router-link
-            :to="{ name: 'book' }"
-            class="d-flex"
-            style="width: 100%"
-          >
+        <div class="feature__group" @click="logout()">
+          <router-link class="d-flex" style="width: 100%">
             <div class="d-flex nav-group">
-              <i class="fa-solid fa-book"></i>
-              Quản lý sách
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              Đăng xuất
               <br />
             </div>
           </router-link>
@@ -80,6 +144,13 @@
 </template>
 
 <script setup>
+import router from "@/router";
+import authService from "@/services/auth.service";
+
+const logout = async () => {
+  await authService.logout();
+  router.push("/login");
+};
 </script>
 
 <style scoped>
