@@ -1,7 +1,7 @@
 <template>
   <main class="app-main p-0" style="height: 100%">
     <div class="container" style="width: 90%">
-      <h2 class="text-center fw-bolder mt-4 mb-4">Danh sách nhà xuất bản</h2>
+      <h2 class="text-center fw-bolder mt-4 mb-4">Quản lý nhà xuất bản</h2>
       <div class="d-flex align-items-center mb-1 row">
         <div class="col-4">
           <div class="form-group d-flex">
@@ -47,13 +47,8 @@
           <tr v-for="producer in producersSearch" :key="producer._id">
             <td>{{ producer.TenNXB }}</td>
             <td>{{ producer.DiaChi }}</td>
-            <td>0</td>
+            <td>{{ producer.soLuongSach }}</td>
             <td>
-              <router-link class="me-2">
-                <button class="btn btn-primary">
-                  <i class="fa-solid fa-circle-info"></i>
-                </button>
-              </router-link>
               <router-link
                 :to="{ name: 'producer.update', params: { id: producer._id } }"
                 class="me-2"
