@@ -1,7 +1,7 @@
 <template>
   <main class="app-main p-0" style="height: 100%">
     <div class="container" style="width: 90%">
-      <h2 class="text-center fw-bolder mt-4 mb-4">Danh sách tác giả</h2>
+      <h2 class="text-center fw-bolder mt-4 mb-4">Quản lý tác giả</h2>
       <div class="d-flex align-items-center mb-1 row">
         <div class="col-4">
           <div class="form-group d-flex">
@@ -10,11 +10,6 @@
               class="form-control me-1"
               v-model="nameSearch"
             />
-            <!-- <select class="form-select me-1" v-model="statusSearch">
-              <option value="" disabled="" selected="">Trạng thái</option>
-              <option value="actived">Đang hoạt động</option>
-              <option value="disabled">Đang khóa</option>
-            </select> -->
 
             <button
               type="submit"
@@ -47,13 +42,8 @@
           <tr v-for="author in authorsSearch" :key="author._id">
             <td>{{ author.HoTen }}</td>
             <td>{{ author.DiaChi }}</td>
-            <td>0</td>
+            <td>{{ author.soLuongSach }}</td>
             <td>
-              <router-link class="me-2">
-                <button class="btn btn-primary">
-                  <i class="fa-solid fa-circle-info"></i>
-                </button>
-              </router-link>
               <router-link
                 :to="{ name: 'author.update', params: { id: author._id } }"
                 class="me-2"
@@ -130,6 +120,7 @@ let nameSearch = ref("");
 const getAuthors = async () => {
   try {
     authors.value = await AuthorService.getAll();
+    console.log(authors.value);
   } catch (error) {
     console.log(error);
   }
@@ -160,7 +151,6 @@ const deleteAuthor = async (author) => {
 
   if (result.isConfirmed) {
     try {
-      console.log(author);
       await AuthorService.delete(author._id);
       await Swal.fire({
         title: "Đã xóa!",
