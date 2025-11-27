@@ -38,6 +38,10 @@ class BookService {
   async delete(id) {
     return (await this.api.delete(`/${id}`)).data;
   }
+
+  async toggleStatus(id) {
+    return (await this.api.patch(`/${id}/toggle-status`)).data;
+  }
 }
 
 export default new BookService();

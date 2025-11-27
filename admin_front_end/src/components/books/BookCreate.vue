@@ -189,6 +189,9 @@
 
         <!-- Nút submit -->
         <div class="text-end">
+          <router-link :to="{ name: 'book' }">
+            <button type="button" class="btn btn-secondary me-2">Hủy</button>
+          </router-link>
           <button
             type="submit"
             class="btn btn-primary px-5"
@@ -259,7 +262,12 @@ onMounted(async () => {
     categories.value = await CategoryService.getAll();
     publishers.value = await ProducerService.getAll();
   } catch (err) {
-    Swal.fire("Lỗi", "Không tải được dữ liệu phụ", "error");
+    await Swal.fire({
+      title: "Lỗi",
+      text: err.response?.data?.message || "Có lỗi xảy ra",
+      icon: "error",
+      theme: "dark",
+    });
   }
 });
 
@@ -327,12 +335,17 @@ const onSubmit = async (values) => {
       title: "Thêm sách thành công!",
       icon: "success",
       timer: 1500,
+      theme: "dark",
     });
     console.log(res);
     router.push({ name: "book" });
   } catch (err) {
-    const msg = err.response?.data?.message || "Có lỗi xảy ra khi thêm sách";
-    Swal.fire("Thất bại", msg, "error");
+    await Swal.fire({
+      title: "Lỗi",
+      text: err.response?.data?.message || "Có lỗi xảy ra khi thêm sách",
+      icon: "error",
+      theme: "dark",
+    });
   }
 };
 </script>

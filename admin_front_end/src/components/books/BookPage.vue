@@ -1,7 +1,7 @@
 <template>
   <main class="app-main p-0" style="height: 100%">
     <div class="container-fluid py-4">
-      <h2 class="text-center fw-bolder mb-4">Danh sách sách</h2>
+      <h2 class="text-center fw-bolder mb-4">Quản lý sách</h2>
 
       <div class="row mb-4 align-items-center">
         <div class="col-lg-8">
@@ -81,9 +81,13 @@
                 {{ sach.SoLuong }}
               </td>
               <td class="text-truncate" style="max-width: 130px">
-                {{ sach.DonGia }}
+                {{ Number(sach.DonGia).toLocaleString("vi-VN") }}đ
               </td>
-              <td class="text-truncate" style="max-width: 130px">
+              <td
+                class="text-truncate"
+                style="max-width: 130px"
+                @click="toggleStatus(sach._id, sach.TrangThai)"
+              >
                 <button v-if="sach.TrangThai == 'on'" class="btn btn-success">
                   Đang bật
                 </button>
@@ -92,7 +96,10 @@
                 </button>
               </td>
               <td>
-                <router-link class="me-2">
+                <router-link
+                  :to="{ name: 'book.detail', params: { id: sach._id } }"
+                  class="me-2"
+                >
                   <button class="btn btn-primary">
                     <i class="fa-solid fa-circle-info"></i>
                   </button>
@@ -166,7 +173,6 @@ import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
 import SachService from "@/services/book.service";
 
-// ĐÃ SỬA ĐÚNG REF() CHO TẤT CẢ BIẾN
 const sachs = ref([]);
 const currentPage = ref(1);
 const totalPages = ref(1);
@@ -197,7 +203,12 @@ const fetchSachs = async (page = 1) => {
     totalPages.value = 1;
     totalItems.value = 0;
 
-    Swal.fire("Lỗi", "Không thể tải danh sách sách", "error");
+    await Swal.fire({
+      title: "Lỗi",
+      text: err.response?.data?.message || "Có lỗi xảy ra",
+      icon: "error",
+      theme: "dark",
+    });
   }
 };
 
@@ -244,6 +255,41 @@ const confirmDelete = async (id) => {
       await Swal.fire({
         title: "Lỗi",
         text: err.response?.data?.message || "Không thể xóa",
+        icon: "error",
+        theme: "dark",
+      });
+    }
+  }
+};
+
+const toggleStatus = async (id, currentStatus) => {
+  const newStatus = currentStatus === "on" ? "off" : "on";
+
+  const result = await Swal.fire({
+    title: "Xác nhận",
+    text: "Đổi trạng thái sách?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Đổi",
+    cancelButtonText: "Hủy",
+    theme: "dark",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      const res = await SachService.toggleStatus(id);
+      Swal.fire({
+        title: "Thành công!",
+        text: `Trạng thái đã đổi thành ${res.trangThai}`,
+        icon: "success",
+        theme: "dark",
+      });
+      sachs.value.find((sach) => sach._id == id).TrangThai = newStatus;
+    } catch (err) {
+      console.log(err);
+      Swal.fire({
+        title: "Lỗi",
+        text: err.response?.data?.message || "Không thể cập nhật",
         icon: "error",
         theme: "dark",
       });

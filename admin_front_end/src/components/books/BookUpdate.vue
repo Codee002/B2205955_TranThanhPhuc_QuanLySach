@@ -207,13 +207,9 @@
         </div>
 
         <div class="text-end">
-          <button
-            type="button"
-            class="btn btn-secondary me-2"
-            @click="router.push({ name: 'book.list' })"
-          >
-            Hủy
-          </button>
+          <router-link :to="{ name: 'book' }">
+            <button type="button" class="btn btn-secondary me-2">Hủy</button>
+          </router-link>
           <button
             type="submit"
             class="btn btn-primary px-5"
@@ -267,7 +263,7 @@ const schema = yup.object({
   SoLuong: yup
     .number("Số lượng là số nguyên")
     .required("Số lượng là bắt buộc")
-    .min(0, "Số lượng không được âm"),
+    .min(1, "Số lượng phải lớn hơn 0"),
   TacGia_id: yup.string().required("Vui lòng chọn tác giả"),
   TheLoai_id: yup.string().required("Vui lòng chọn thể loại"),
   NhaXuatBan_id: yup.string().required("Vui lòng chọn nhà xuất bản"),
@@ -353,12 +349,17 @@ const onSubmit = async (values) => {
       title: "Cập nhật thành công!",
       icon: "success",
       timer: 1500,
+      theme: "dark",
     });
 
     router.push({ name: "book" });
   } catch (err) {
-    const msg = err.response?.data?.message || "Cập nhật thất bại";
-    Swal.fire("Lỗi", msg, "error");
+    await Swal.fire({
+      title: "Lỗi",
+      text: err.response?.data?.message || "Có lỗi xảy ra",
+      icon: "error",
+      theme: "dark",
+    });
   }
 };
 
