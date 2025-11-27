@@ -1,6 +1,12 @@
-import './assets/main.css'
+import router from "./router";
+import setupVeeValidate from "./plugins/vee-validate";
+import { createApp } from "vue";
+import App from "./App.vue";
 
-import { createApp } from 'vue'
-import App from './App.vue'
+// CSS
+import "./assets/styles/global.css";
 
-createApp(App).mount('#app')
+const app = createApp(App);
+
+setupVeeValidate();
+app.use(router).mount("#app");
