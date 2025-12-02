@@ -18,6 +18,7 @@ class PhieuMuonService {
       NgayDuyet: null,
       NgayTra: null,
       HanTra: null,
+      SoNgayTraMuon: null,
     };
 
     Object.keys(phieuMuon).forEach(
@@ -263,21 +264,36 @@ class PhieuMuonService {
 
       if (phieu.HanTra) {
         const hanTra = new Date(phieu.HanTra);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
 
-        if (phieu.TrangThai === "Đang mượn" && today > hanTra) {
-          SoNgayQuaHan = Math.floor((today - hanTra) / (1000 * 60 * 60 * 24));
-          TienPhat = SoNgayQuaHan * PHAT_MOI_NGAY;
-        }
+        let SoNgayQuaHan = 0;
+        let TienPhat = 0;
 
-        if (phieu.TrangThai === "Đã trả" && phieu.NgayTra) {
-          const ngayTra = new Date(phieu.NgayTra);
-          if (ngayTra > hanTra) {
-            SoNgayQuaHan = Math.floor(
-              (ngayTra - hanTra) / (1000 * 60 * 60 * 24)
-            );
+        console.log("HẠN TRẢ");
+        console.log(hanTra);
+        if (phieu.TrangThai === "Đang mượn") {
+          const now = new Date();
+          console.log("HIỆN TẠI");
+          console.log(now);
+          if (now > hanTra) {
+            const diffMs = now - hanTra;
+
+            SoNgayQuaHan = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
             TienPhat = SoNgayQuaHan * PHAT_MOI_NGAY;
+            console.log("HIỆN TẠI KẾT QUẢ");
+            console.log(diffMs);
+            console.log(SoNgayQuaHan);
+          }
+        } else if (phieu.TrangThai === "Đã trả" && phieu.NgayTra) {
+          const ngayTra = new Date(phieu.NgayTra);
+          console.log("ĐÃ TRẢ");
+          console.log(now);
+          if (ngayTra > hanTra) {
+            const diffMs = ngayTra - hanTra;
+            SoNgayQuaHan = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+            TienPhat = SoNgayQuaHan * PHAT_MOI_NGAY;
+            console.log("ĐÃ TRẢ KẾT QUẢ");
+            console.log(diffMs);
+            console.log(SoNgayQuaHan);
           }
         }
       }
@@ -309,6 +325,7 @@ class PhieuMuonService {
     limit = 10,
     keyword = "",
     status = "",
+    overDue = 0,
   } = {}) {
     // Ép kiểu an toàn
     const pageNum = Math.max(1, parseInt(page) || 1);
@@ -356,6 +373,47 @@ class PhieuMuonService {
     // Lọc trạng thái
     if (status && status !== "all") {
       pipeline.push({ $match: { TrangThai: status } });
+    }
+
+    // === LỌC THEO overDue (quá hạn) ===
+    if (overDue === 1 || overDue === "1") {
+      pipeline.push({
+        $addFields: {
+          SoNgayQuaHan: {
+            $cond: {
+              if: { $eq: ["$TrangThai", "Đang mượn"] },
+              then: {
+                $ceil: {
+                  $divide: [
+                    { $subtract: [new Date(), "$HanTra"] },
+                    1000 * 60 * 60 * 24,
+                  ],
+                },
+              },
+              else: {
+                $cond: {
+                  if: { $eq: ["$TrangThai", "Đã trả"] },
+                  then: {
+                    $ceil: {
+                      $divide: [
+                        { $subtract: ["$NgayTra", "$HanTra"] },
+                        1000 * 60 * 60 * 24,
+                      ],
+                    },
+                  },
+                  else: 0,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      pipeline.push({
+        $match: {
+          $expr: { $gt: ["$SoNgayQuaHan", 0] },
+        },
+      });
     }
 
     // === ĐẾM TỔNG TRƯỚC KHI PHÂN TRANG ===
@@ -584,7 +642,7 @@ class PhieuMuonService {
   }
 
   // Xác nhận trả sách
-  async returnBook(phieuId, adminId) {
+  async returnBook(phieuId, adminId, soNgayTraMuon) {
     const objectId = ObjectId.isValid(phieuId) ? new ObjectId(phieuId) : null;
     if (!objectId) throw new Error("ID phiếu không hợp lệ");
 
@@ -599,6 +657,7 @@ class PhieuMuonService {
       {
         $set: {
           TrangThai: "Đã trả",
+          SoNgayTraMuon: soNgayTraMuon,
           NgayTra: new Date(),
           NguoiXacNhanTra: new ObjectId(adminId),
         },

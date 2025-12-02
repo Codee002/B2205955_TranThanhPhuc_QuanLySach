@@ -5,13 +5,20 @@ class BorrowService {
     this.api = createApiClient(baseUrl);
   }
 
-  async getAll({ page = 1, limit = 10, keyword = "", status = "" } = {}) {
+  async getAll({
+    page = 1,
+    limit = 10,
+    keyword = "",
+    status = "",
+    overDue = "",
+  } = {}) {
     const params = {
       page,
       limit,
     };
     if (keyword.trim()) params.keyword = keyword.trim();
     if (status) params.status = status;
+    if (overDue != 0) params.overDue = overDue;
 
     return (await this.api.get("/", { params })).data;
   }
@@ -41,8 +48,14 @@ class BorrowService {
   }
 
   // Xác nhận trả sách
-  async return(id) {
-    return (await this.api.patch(`/${id}/return`)).data;
+  async return(id, soNgayTraMuon) {
+    try {
+      return (
+        await this.api.patch(`/${id}/return`, { soNgayTraMuon: soNgayTraMuon })
+      ).data;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
 

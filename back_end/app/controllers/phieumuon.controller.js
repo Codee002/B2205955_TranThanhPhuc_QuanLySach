@@ -70,6 +70,7 @@ exports.findAll = async (req, res, next) => {
   const limit = parseInt(req.query.limit) || 10; // ← ĐÂY LÀ CHÌA KHÓA!
   const keyword = (req.query.keyword || "").toString().trim();
   const status = (req.query.status || "").toString().trim();
+  const overDue = req.query.overDue || 0;
 
   // Bảo vệ limit quá lớn (tránh crash server)
   const safeLimit = limit > 1000 ? 1000 : limit;
@@ -81,6 +82,7 @@ exports.findAll = async (req, res, next) => {
       limit: safeLimit,
       keyword,
       status,
+      overDue,
     });
 
     return res.json({
@@ -272,7 +274,7 @@ exports.return = async (req, res, next) => {
   }
 
   const { id } = req.params;
-
+  const soNgayTraMuon = req.body.soNgayTraMuon;
   if (!ObjectId.isValid(id)) {
     return next(new ApiError(400, "ID phiếu mượn không hợp lệ"));
   }
@@ -280,7 +282,11 @@ exports.return = async (req, res, next) => {
   try {
     const phieuMuonService = new PhieuMuonService(MongoDB.client);
 
-    const updated = await phieuMuonService.returnBook(id, req.user._id);
+    const updated = await phieuMuonService.returnBook(
+      id,
+      req.user._id,
+      soNgayTraMuon
+    );
 
     if (!updated) {
       return next(
