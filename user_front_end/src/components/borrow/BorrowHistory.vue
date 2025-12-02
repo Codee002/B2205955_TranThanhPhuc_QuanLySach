@@ -60,17 +60,19 @@
               </select>
             </div>
 
-            <!-- Khoảng thời gian -->
+            <!-- Trạng thái -->
             <div class="col-md-2">
               <select
-                v-model="filters.timeRange"
+                v-model="filters.status"
                 @change="applyFilters"
                 class="form-select"
               >
-                <option value="all">Tất cả thời gian</option>
-                <option value="week">Tuần này</option>
-                <option value="month">Tháng này</option>
-                <option value="3months">3 tháng gần đây</option>
+                <option value="" selected>Tất cả trạng thái</option>
+                <option value="Chờ duyệt">Chờ duyệt</option>
+                <option value="Đang mượn">Đang mượn</option>
+                <option value="Đã trả">Đã trả</option>
+                <option value="Đã hủy">Đã hủy</option>
+                <option value="Từ chối">Từ chối</option>
               </select>
             </div>
           </div>
@@ -177,6 +179,7 @@ const filters = ref({
   theloai: "",
   tacgia: "",
   timeRange: "all",
+  status: "",
 });
 
 // Lấy danh sách thể loại & tác giả từ dữ liệu
@@ -214,16 +217,8 @@ const filteredBorrows = computed(() => {
     result = result.filter((item) => item.sach.TacGia === filters.value.tacgia);
   }
 
-  // Lọc thời gian
-  if (filters.value.timeRange !== "all") {
-    const now = new Date();
-    let days = 0;
-    if (filters.value.timeRange === "week") days = 7;
-    if (filters.value.timeRange === "month") days = 30;
-    if (filters.value.timeRange === "3months") days = 90;
-
-    const cutoff = new Date(now.setDate(now.getDate() - days));
-    result = result.filter((item) => new Date(item.NgayMuon) >= cutoff);
+  if (filters.value.status) {
+    result = result.filter((item) => item.TrangThai == filters.value.status);
   }
 
   return result;

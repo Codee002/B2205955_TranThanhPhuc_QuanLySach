@@ -139,13 +139,13 @@
                         <tr>
                           <td class="text-muted fw-medium">Số ngày quá hạn</td>
                           <td class="text-danger fw-bold">
-                            {{ borrow.SoNgayQuaHan }} ngày
+                            {{ daysOverdue }} ngày
                           </td>
                         </tr>
                         <tr>
                           <td class="text-muted fw-medium">Tiền phạt</td>
                           <td class="text-danger fw-bold">
-                            {{ formatCurrency(daysOverdue * 10000) }}đ
+                            {{ formatCurrency(daysOverdue) }}đ
                             <small class="d-block text-muted"
                               >(10.000đ/ngày)</small
                             >
@@ -250,17 +250,23 @@ const cancel = async () => {
 };
 
 const daysOverdue = computed(() => {
-  if (
-    !borrow.value?.HanTra ||
-    !["Đang mượn", "Đã trả"].includes(borrow.value.TrangThai)
-  )
-    return 0;
+  if (!borrow.value?.HanTra) return 0;
+
+  const allowedStatuses = ["Đang mượn", "Đã trả"];
+  if (!allowedStatuses.includes(borrow.value.TrangThai)) return 0;
+
   const hanTra = new Date(borrow.value.HanTra);
   const ngayTra = borrow.value.NgayTra
     ? new Date(borrow.value.NgayTra)
     : new Date();
-  const diff = Math.floor((ngayTra - hanTra) / (1000 * 60 * 60 * 24));
-  return diff > 0 ? diff : 0;
+
+  if (ngayTra <= hanTra) return 0;
+
+  const diffMs = ngayTra - hanTra;
+
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  return diffDays;
 });
 
 const isOverdue = computed(() => daysOverdue.value > 0);
@@ -277,8 +283,10 @@ const formatDate = (date) => {
   });
 };
 
-const formatCurrency = (num) =>
-  new Intl.NumberFormat("vi-VN").format(num * 10000);
+const formatCurrency = (days) => {
+  const fine = days * 10000;
+  return new Intl.NumberFormat("vi-VN").format(fine);
+};
 
 const getStatusText = (s) =>
   ({
