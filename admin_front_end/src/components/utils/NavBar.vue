@@ -66,7 +66,7 @@
           >
             <div class="d-flex nav-group">
               <i class="fa-solid fa-book-open-reader"></i>
-              Quản lý đọc giả
+              Quản lý độc giả
               <br />
             </div>
           </router-link>
