@@ -20,6 +20,11 @@
           <option value="Đã hủy">Đã hủy</option>
           <option value="Từ chối">Từ chối</option>
         </select>
+        <select class="form-select" style="width: auto" v-model="overDueFilter">
+          <option value="">Quá hạn</option>
+          <option value="1">Có</option>
+          <option value="0">Không</option>
+        </select>
         <button @click="loadBorrows(1)" class="btn btn-primary">
           <i class="fas fa-search"></i> Tìm
         </button>
@@ -113,7 +118,7 @@
                 <!-- Nhận trả sách -->
                 <button
                   v-if="item.TrangThai === 'Đang mượn'"
-                  @click="returnBook(item._id)"
+                  @click="returnBook(item)"
                   class="btn btn-primary me-1"
                   title="Xác nhận trả sách"
                 >
@@ -196,11 +201,12 @@ const pagination = ref({
 });
 const searchKeyword = ref("");
 const statusFilter = ref("");
+const overDueFilter = ref("");
 const baseUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 // Tự động tìm kiếm khi gõ hoặc đổi filter
 watch(
-  [searchKeyword, statusFilter],
+  [searchKeyword, statusFilter, overDueFilter],
   () => {
     loadBorrows(1);
   },
@@ -215,11 +221,11 @@ const loadBorrows = async (page = 1) => {
       limit: 10,
       keyword: searchKeyword.value,
       status: statusFilter.value,
+      overDue: overDueFilter.value,
     });
 
-    console.log(response);
-
     borrows.value = response.data;
+    console.log(borrows.value);
     pagination.value = {
       total: response.total,
       page: response.page,
@@ -316,7 +322,7 @@ const reject = async (id) => {
   }
 };
 
-const returnBook = async (id) => {
+const returnBook = async (item) => {
   const { isConfirmed } = await Swal.fire({
     title: "Xác nhận đã trả sách?",
     text: "Phiếu sẽ chuyển sang trạng thái Đã trả",
@@ -327,8 +333,20 @@ const returnBook = async (id) => {
   });
 
   if (isConfirmed) {
+    const daysOverdue = computed(() => {
+      const hanTra = new Date(item.HanTra);
+      const ngayTra = item.NgayTra ? new Date(item.NgayTra) : new Date();
+
+      if (ngayTra <= hanTra) return 0;
+
+      const diffMs = ngayTra - hanTra;
+
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+      return diffDays;
+    });
     try {
-      const res = await BorrowService.return(id);
+      const res = await BorrowService.return(item._id, daysOverdue.value);
       const updated = res.data || res;
 
       updateBorrowInList(updated);
