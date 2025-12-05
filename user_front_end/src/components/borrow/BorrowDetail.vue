@@ -217,7 +217,7 @@ const loadBorrowDetail = async () => {
     borrow.value = res.data || res;
   } catch (err) {
     console.error(err);
-    Swal.fire("Lỗi", "Không thể tải lại thông tin phiếu", "error");
+    Swal.fire("Lỗi", err.response.data.message, "error");
   } finally {
     loading.value = false;
   }

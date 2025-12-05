@@ -15,7 +15,10 @@ class AuthService {
   async loginDocGia({ username, password }) {
     const res = await this.api.post("/login-docgia", { username, password });
     const user = res.data.user;
+    const token = res.data.token;
+
     localStorage.setItem("currentUser", JSON.stringify(user));
+    localStorage.setItem("access_token", token);
     return user;
   }
 
@@ -23,31 +26,14 @@ class AuthService {
   async logout() {
     await this.api.post("/logout");
     localStorage.removeItem("currentUser");
-  }
-
-  // LẤY THÔNG TIN NGƯỜI DÙNG HIỆN TẠI
-  async me() {
-    try {
-      const res = await this.api.get("/me");
-      const user = res.data.user;
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      return user;
-    } catch (err) {
-      localStorage.removeItem("currentUser");
-      throw err;
-    }
-  }
-
-  // Cập nhật trang cá nhân
-  async updateProfile(data) {
-    const response = await this.api.put("/updateProfile", data);
-    return response.data;
+    localStorage.removeItem("access_token");
   }
 
   getCurrentUser() {
     const user = localStorage.getItem("currentUser");
-    console.log(user ? JSON.parse(user) : null);
-    return user ? JSON.parse(user) : null;
+    const token = localStorage.getItem("access_token");
+    if (!user || !token) return null;
+    return JSON.parse(user);
   }
 
   isLoggedIn() {

@@ -216,7 +216,7 @@ import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
-import authService from "@/services/auth.service";
+import readerService from "@/services/reader.service";
 
 const currentUser = ref({});
 
@@ -280,7 +280,7 @@ const onSubmit = async (values) => {
       formData.append("removeAvatar", "true");
     }
 
-    const res = await authService.updateProfile(formData);
+    const res = await readerService.updateProfile(formData);
 
     console.log(res);
     Swal.fire({
@@ -300,6 +300,7 @@ const onSubmit = async (values) => {
     previewUrl.value = "";
     removeAvatarChecked.value = false;
   } catch (err) {
+    console.log(err);
     Swal.fire(
       "Lỗi",
       err.response?.data?.message || "Cập nhật thất bại",
@@ -310,7 +311,7 @@ const onSubmit = async (values) => {
 
 onMounted(async () => {
   try {
-    const user = await authService.me();
+    const user = await readerService.me();
     console.log(user);
     if (!user || !user.Username) {
       Swal.fire("Lỗi", "Không tìm thấy thông tin tài khoản", "error");

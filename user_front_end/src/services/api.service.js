@@ -6,22 +6,23 @@ const commonConfig = {
   },
 };
 export const createApiClient = (baseURL) => {
-  return axios.create({
+  const instance = axios.create({
     baseURL,
     ...commonConfig,
+    withCredentials: true,
     timeout: 10000,
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
 
-  // api.interceptors.request.use((config) => {
-  //   const token = localStorage.getItem("adminToken");
-  //   if (token) {
-  //     config.headers.Authorization = `Bearer ${token}`;
-  //   }
-  //   return config;
-  // });
+  instance.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token") || "";
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
 
-  // return api;
+  return instance;
 };

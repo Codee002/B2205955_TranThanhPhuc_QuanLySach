@@ -88,6 +88,7 @@ const onSubmit = async (values) => {
     await authService.loginDocGia(values);
     router.push("/home");
   } catch (err) {
+    console.log(err);
     Swal.fire(
       "Lỗi",
       err.response?.data?.message || "Đăng nhập thất bại",

@@ -67,10 +67,9 @@ const fetchHomeData = async () => {
       }
     });
 
-    // Lấy top 8 sách mượn nhiều nhất
     const topIds = Object.keys(borrowCount)
       .sort((a, b) => borrowCount[b] - borrowCount[a])
-      .slice(0, 16);
+      .slice(0, 12);
 
     if (topIds.length === 0) {
       topBorrowedBooks.value = [];
@@ -102,7 +101,7 @@ const fetchHomeData = async () => {
     topBorrowedBooks.value = books.filter(Boolean);
     console.log(topBorrowedBooks.value);
   } catch (err) {
-    console.error("Lỗi tải trang chủ:", err);
+    console.log("Lỗi tải trang chủ:", err);
     topBorrowedBooks.value = [];
   } finally {
     loading.value = false;
