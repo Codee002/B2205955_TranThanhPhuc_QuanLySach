@@ -88,6 +88,7 @@ const onSubmit = async (values) => {
     await authService.loginAdmin(values);
     router.push("/dashboard");
   } catch (err) {
+    console.log(err);
     await Swal.fire({
       title: "Lỗi",
       text: err.response?.data?.message || "Đăng nhập thất bại",

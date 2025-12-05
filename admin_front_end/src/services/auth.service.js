@@ -23,6 +23,9 @@ class AuthService {
   async loginAdmin({ username, password }) {
     const res = await this.api.post("/login-admin", { username, password });
     const user = res.data.user;
+    const token = res.data.token;
+
+    localStorage.setItem("access_token", token);
     localStorage.setItem("currentUser", JSON.stringify(user));
     return user;
   }
@@ -31,6 +34,7 @@ class AuthService {
   async logout() {
     await this.api.post("/logout");
     localStorage.removeItem("currentUser");
+    localStorage.removeItem("access_token");
   }
 
   // LẤY THÔNG TIN NGƯỜI DÙNG HIỆN TẠI
@@ -42,6 +46,7 @@ class AuthService {
       return user;
     } catch (err) {
       localStorage.removeItem("currentUser");
+      localStorage.removeItem("access_token");
       throw err;
     }
   }
@@ -49,7 +54,9 @@ class AuthService {
   // Helper: lấy user từ localStorage
   getCurrentUser() {
     const user = localStorage.getItem("currentUser");
-    return user ? JSON.parse(user) : null;
+    const token = localStorage.getItem("access_token");
+    if (!user || !token) return null;
+    return JSON.parse(user);
   }
 
   isLoggedIn() {

@@ -6,7 +6,7 @@ const commonConfig = {
   },
 };
 export const createApiClient = (baseURL) => {
-  return axios.create({
+  const instance = axios.create({
     baseURL,
     ...commonConfig,
     withCredentials: true,
@@ -15,4 +15,14 @@ export const createApiClient = (baseURL) => {
       "Content-Type": "multipart/form-data",
     },
   });
+
+  instance.interceptors.request.use((config) => {
+    const token = localStorage.getItem("access_token") || "";
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  return instance;
 };
